@@ -32,29 +32,66 @@ server.route({
 	}
 });
 
-// Add the route
+// Add the route for search by tag
+// server.route({
+//     method: 'GET',
+//     path:'/flickr', 
+//     handler: function (request, reply) {
+// 		var credentials = require('./shared/credentials.js'),
+// 		flickrLib = require('./shared/flickr.js'),
+// 			httpRequest = require('request'),
+// 			flickr = {
+// 				"url": 'https://api.flickr.com/services/rest/',
+// 				"qs": {
+// 					"method": 'flickr.photos.search',
+// 					"api_key": credentials.flickr.api_key,
+// 					"tags": 'seabus',
+// 					"format": 'json',
+// 					"nojsoncallback": 1
+// 				},
+// 				"json": true
+// 			};
+
+
+// Route for search specific person
 server.route({
-    method: 'GET',
-    path:'/flickr', 
-    handler: function (request, reply) {
-		var credentials = require('./shared/credentials.js'),
-			httpRequest = require('request'),
-			flickr = {
-				"url": 'https://api.flickr.com/services/rest/',
-				"qs": {
-					"method": 'flickr.photos.search',
-					"api_key": credentials.flickr.api_key,
-					"tags": 'seabus',
-					"format": 'json',
-					"nojsoncallback": 1
-				},
-				"json": true
-			};
+	method: 'GET',
+	path:'/flickr', 
+	handler: function (request, reply) {
+	var credentials = require('./shared/credentials.js'),
+	flickrLib = require('./shared/flickr.js'),
+		httpRequest = require('request'),
+		flickr = {
+			"url": 'https://api.flickr.com/services/rest/',
+			"qs": {
+				"method": 'flickr.people.getPublicPhotos',
+				"api_key": credentials.flickr.api_key,
+				"user_id": credentials.flickr.user_id,
+				"format": 'json',
+				"nojsoncallback": 1
+			},
+			"json": true
+		};
+
+
+
+
 		httpRequest(flickr, function (error, incomingMessage, response) {
 			if (!error && incomingMessage.statusCode === 200) {
-				reply(response); // Browser output
+				var photoSrc = flickrLib.createJpgPath(response.photos.photo);
+				var html = "";
+				var i = "";
+				for (i=0; i < photoSrc.length; i++) {
+					html += '<img src="' + photoSrc[i] + '">';
+				}
+
+				reply(html); // Browser output
 				console.log("Command window");
 			}
+
+
+			
+
 		});
     }
 });
