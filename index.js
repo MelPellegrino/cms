@@ -7,96 +7,80 @@ server.connection({
     port: 8000 
 });
 
-
 server.route({
 	method: 'GET',
 	path:'/{param*}',
 	handler: {
-		directory: {
-			path: "public",
-			listing: true,
-			index: false
-		}
-	}
+        directory: {
+            path: "public",
+            listing: true,
+            index: false
+        }
+    }
 });
-
 server.route({
 	method: 'GET',
 	path:'/shared/{param*}',
 	handler: {
-		directory: {
-			path: "shared",
-			listing: true,
-			index: false
-		}
-	}
+        directory: {
+            path: "shared",
+            listing: true,
+            index: false
+        }
+    }
 });
 
-// Add the route for search by tag
-// server.route({
-//     method: 'GET',
-//     path:'/flickr', 
-//     handler: function (request, reply) {
-// 		var credentials = require('./shared/credentials.js'),
-// 		flickrLib = require('./shared/flickr.js'),
-// 			httpRequest = require('request'),
-// 			flickr = {
-// 				"url": 'https://api.flickr.com/services/rest/',
-// 				"qs": {
-// 					"method": 'flickr.photos.search',
-// 					"api_key": credentials.flickr.api_key,
-// 					"tags": 'seabus',
-// 					"format": 'json',
-// 					"nojsoncallback": 1
-// 				},
-// 				"json": true
-// 			};
-
-
-// Route for search specific person
+// Add the route
 server.route({
-	method: 'GET',
-	path:'/flickr', 
-	handler: function (request, reply) {
-	var credentials = require('./shared/credentials.js'),
-	flickrLib = require('./shared/flickr.js'),
-		httpRequest = require('request'),
-		flickr = {
-			"url": 'https://api.flickr.com/services/rest/',
-			"qs": {
-				"method": 'flickr.people.getPublicPhotos',
-				"api_key": credentials.flickr.api_key,
-				"user_id": credentials.flickr.user_id,
-				"format": 'json',
-				"nojsoncallback": 1
-			},
-			"json": true
-		};
-
-
-
-
+    method: 'GET',
+    path:'/flickr', 
+    handler: function (request, reply) {
+		var credentials = require('./shared/credentials.js'),
+			flickrLib = require('./shared/flickr.js'),
+			httpRequest = require('request'),
+			flickr = {
+				"url": 'https://api.flickr.com/services/rest/',
+				"qs": {
+					"method": 'flickr.photos.search',
+					"api_key": credentials.flickr.api_key,
+					"tags": 'seabus',
+					"format": 'json',
+					"nojsoncallback": 1
+				},
+				"json": true
+			};
 		httpRequest(flickr, function (error, incomingMessage, response) {
 			if (!error && incomingMessage.statusCode === 200) {
 				var photoSrc = flickrLib.createJpgPath(response.photos.photo);
-				var html = "";
-				var i = "";
-				for (i=0; i < photoSrc.length; i++) {
-					html += '<img src="' + photoSrc[i] + '">';
-				}
-
-				reply(html); // Browser output
-				console.log("Command window");
+				// todo inclass: output HTML images
+				reply("<img src='hello.png'>"); // Complete browser output
 			}
-
-
-			
-
 		});
     }
 });
 
-
+server.route({
+    method: 'GET',
+    path:'/myflickr', 
+    handler: function (request, reply) {
+		var credentials = require('./shared/credentials.js'),
+			flickrLib = require('./shared/flickr.js'),
+			httpRequest = require('request');
+		flickrLib.myflickrOptions.qs.api_key = credentials.flickr.api_key;
+		flickrLib.myflickrOptions.qs.user_id = credentials.flickr.user_id;
+		
+		httpRequest(flickrLib.myflickrOptions, function (error, incomingMessage, response) {
+			if (!error && incomingMessage.statusCode === 200) {
+				var html = '';
+					photoSrc = flickrLib.createJpgPath(response.photos.photo);
+				for (var i = 0, len = photoSrc.length; i < len; i++) {
+					html += "<img src='" + photoSrc[i] + "'>";
+				}
+				reply(html); // Complete browser output
+			}
+		});
+    }
+});
 
 // Start the server
 server.start(function () {
