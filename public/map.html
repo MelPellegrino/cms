@@ -19,11 +19,39 @@
 
 	<!-- Page specific code -->
 
-	<script>
-		var map = new mxn.Mapstraction('mapBox', 'leaflet'); 
-		var latlon = new mxn.LatLonPoint(51.50733, -0.12769);
+	<script type="text/javascript">
+		var map = new mxn.Mapstraction('mapBox', 'leaflet'),
+		locations = {
+			london: {
+				lat: 51.50733,
+				lon: -0.12769,
+				zoom: 10,
+				typeMap: mxn.Mapstraction.ROAD
+			},
+			austin: {
+				lat: 30.358817,
+				lon: -97.8868987,
+				zoom: 17,
+				typeMap: mxn.Mapstraction.SATELLITE
+			},
+			gastown: {
+				lat: 49.2842749,
+				lon: -123.1096893,
+				zoom: 16,
+				typeMap: mxn.Mapstraction.ROAD
+			}
+		};
 
-		map.setCenterAndZoom(latlon, 10);
+		var latlon = new mxn.LatLonPoint(locations.gastown.lat,locations.gastown.lon);
+		map.setCenterAndZoom(latlon, locations.gastown.zoom);
+		map.setMapType(locations.gastown.typeMap);
+
+		var marker = new mxn.Marker(latlon);
+		map.addMarker(marker);
+		marker.addData({'infoBubble': 'This is Hipster Town'})
+		marker.openBubble();
+	
+	
 	</script>
 
 </body>
