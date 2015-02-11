@@ -82,6 +82,24 @@ server.route({
     }
 });
 
+server.route({
+    method: 'GET',
+    path:'/twitter', 
+    handler: function (request, reply) {
+    	var credentials = require("./credentials/credentials.js"),
+			Twit = require('twit'),
+			twitterClient = new Twit(credentials.twitter);
+
+		twitterClient.get('statuses/user_timeline', { screen_name: 'vanarts', count: 2 },  function (err, data, response) {
+			var html = 'Twit Titles are : <br><br>';
+			for (var i = 0; i < data.length; i++) {
+					html += (i+1) + "." + data[i].text + "<br>";
+				}
+			reply(html) // browser output
+		});
+    }
+});
+
 // Start the server
 server.start(function () {
 	console.log('Server running at ' + server.info.uri);
